@@ -4,7 +4,7 @@
         <ul>
           <li v-for="item in goods" class="menu-item">
             <span class="text">
-               <span v-if="item.type > 0" class="icon"  :class="classMap[item.type]"></span>
+               <icon v-if="item.type > 0" :icontype="{type:item.type,size:'threeSize'}"></icon>
               {{item.name}}
             </span>
           </li>
@@ -17,12 +17,12 @@
 
 
 <script type="text/ecmascript-6">
+  import icon from 'components/icon/icon';
 
     export default{
         data(){
            return{
-             goods:[],
-             classMap: ['decrease', 'discount', 'guarantee', 'invoice', 'special']
+             goods:[]
            }
         },
         props: ['seller'],
@@ -35,6 +35,9 @@
             }
           })
         },
+        components:{
+          icon
+        }
     }
 </script>
 
@@ -63,25 +66,6 @@
           display table-cell
           vertical-align middle
           font-size 12px
-          .icon
-            display:inline-block
-            width:12px
-            height:12px
-            vertical-align top
-            margin-right:2px
-            background-size:12px 12px
-            background-repeat:no-repeat
-            &.decrease
-              bg-image('decrease_3')
-            &.discount
-              bg-image('discount_3')
-            &.guarantee
-              bg-image('guarantee_3')
-            &.invoice
-              bg-image('invoice_3')
-            &.special
-              bg-image('special_3')
-
     .foots-wrapper
       flex:1
 
