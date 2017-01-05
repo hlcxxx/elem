@@ -1,6 +1,6 @@
 <template>
     <div class="goods">
-      <div class="menu-wrapper">
+      <div class="menu-wrapper" v-el:menu-wrapper>
         <ul>
           <li v-for="item in goods" class="menu-item">
             <span class="text">
@@ -10,7 +10,7 @@
           </li>
         </ul>
       </div>
-      <div class="foots-wrapper">
+      <div class="foots-wrapper" v-el:foods-wrapper>
         <ul>
           <li v-for="item in goods" class="foods-list">
             <h1 class="title">{{item.name}}</h1>
@@ -45,6 +45,7 @@
 
 <script type="text/ecmascript-6">
   import icon from 'components/icon/icon';
+  import BScroll from 'better-scroll';
 
     export default{
         data(){
@@ -60,11 +61,18 @@
             if (response.erron === 0) {
               this.goods = response.data;
 
-              for(let item in this.goods){
-                console.log(this.goods[item].name);
-              }
+              this.$nextTick(()=>{
+                this._initScroll();
+              })
             }
           })
+        },
+        methods:{
+          _initScroll(){
+            this.menuScroll = new BScroll(this.$els.menuWrapper,{});
+            this.foodsScroll = new BScroll(this.$els.foodsWrapper,{});
+
+          }
         },
         components:{
           icon
