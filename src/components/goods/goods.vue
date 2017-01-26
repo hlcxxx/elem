@@ -2,7 +2,10 @@
     <div class="goods">
       <div class="menu-wrapper" v-el:menu-wrapper>
         <ul>
-          <li v-for="item in goods" class="menu-item">
+          <li v-for="item in goods" class="menu-item"
+              :class="{'current':currentIndex === $index }"
+              @click="selectMenu($index,$event)"
+          >
             <span class="text">
                <icon v-if="item.type > 0" :icontype="{type:item.type,size:'threeSize'}"></icon>
               {{item.name}}
@@ -12,7 +15,7 @@
       </div>
       <div class="foots-wrapper" v-el:foods-wrapper>
         <ul>
-          <li v-for="item in goods" class="foods-list">
+          <li v-for="item in goods" class="foods-list foods-list-hook">
             <h1 class="title">{{item.name}}</h1>
             <ul>
               <li v-for="food in item.foods" class="food-item border-1px">
@@ -50,7 +53,9 @@
     export default{
         data(){
            return{
-             goods:[]
+             goods:[],
+             listHeights:[],
+             scrollY:0
            }
         },
         props: ['seller'],
@@ -63,15 +68,55 @@
 
               this.$nextTick(()=>{
                 this._initScroll();
+                this._calculateHeight();
               })
             }
           })
         },
+        computed:{
+          currentIndex(){
+            for(let i = 0 ; i < this.listHeights.length; i++){
+              let height1 = this.listHeights[i];
+              let height2 = this.listHeights[i+1];
+              if(!height2 || (this.scrollY >= height1 && this.scrollY < height2)){
+                return i;
+              }
+            }
+
+            return 0;
+
+          }
+        },
         methods:{
           _initScroll(){
-            this.menuScroll = new BScroll(this.$els.menuWrapper,{});
-            this.foodsScroll = new BScroll(this.$els.foodsWrapper,{});
-
+            this.menuScroll = new BScroll(this.$els.menuWrapper,{
+              click:true
+            });
+            this.foodsScroll = new BScroll(this.$els.foodsWrapper,{
+              probeType:3
+            });
+            this.foodsScroll.on('scroll',(pos)=>{
+              this.scrollY =  Math.abs(Math.round(pos.y));
+            });
+          },
+          _calculateHeight(){
+            let footList = this.$els.foodsWrapper.getElementsByClassName("foods-list-hook");
+            let height = 0;
+            this.listHeights.push(height);
+            for(let i = 0 ; i < footList.length;i++){
+              let item = footList[i];
+              height += item.clientHeight;
+              this.listHeights.push(height);
+            }
+          },
+          selectMenu(index,event){
+            if(!event._constructed){
+              return ;
+            }
+            let footList = this.$els.foodsWrapper.getElementsByClassName("foods-list-hook");
+            let el = footList[index];
+            this.foodsScroll.scrollToElement(el,300);
+            console.log(index);
           }
         },
         components:{
@@ -105,6 +150,13 @@
           display table-cell
           vertical-align middle
           font-size 12px
+      .current
+        background #ffffff
+        position relative
+        z-index 10
+        margin-top -1px
+        font-weight 700
+
     .foots-wrapper
       flex:1
       .title
